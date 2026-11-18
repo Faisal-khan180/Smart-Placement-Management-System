@@ -114,8 +114,10 @@ these just exist in the `users` table).
 
 ## Environment variables
 
-See `backend/.env.example`. No real secrets are committed — copy it to
-`.env` and fill in your own values.
+See `backend/.env.example` and `frontend/.env.example` for separate local
+configuration. Do not commit populated `.env` files. For Railway, set the
+variables in each service's **Variables** settings; Railway does not load
+local `.env` files from the repository.
 
 ```text
 PORT=5000
@@ -128,6 +130,38 @@ DB_NAME=placement_management
 JWT_SECRET=
 JWT_EXPIRES_IN=7d
 ```
+
+## Railway deployment
+
+Deploy this repository as two Railway services so the frontend and API can
+have independent environment variables:
+
+1. Create a MySQL service and a backend service with **Root Directory** set
+  to `/backend`. Use `npm start` as the start command.
+2. Add the backend variables `NODE_ENV=production`, `DB_HOST`, `DB_PORT`,
+  `DB_USER`, `DB_PASSWORD`, `DB_NAME`, `JWT_SECRET`, `JWT_EXPIRES_IN`, and
+  `FRONTEND_ORIGIN`. Map the five DB variables to your Railway MySQL service
+  values (`MYSQLHOST`, `MYSQLPORT`, `MYSQLUSER`, `MYSQLPASSWORD`, and
+  `MYSQLDATABASE`). Set `FRONTEND_ORIGIN` to the frontend service's public
+  origin, without a trailing slash. Generate a unique long random
+  `JWT_SECRET`; do not reuse the example value.
+3. Before first use, run `npm run db:migrate` from the backend service
+  directory with its Railway variables available. This creates/updates the
+  schema. Seed demo data only when desired with `npm run db:seed`.
+4. Create a frontend service with **Root Directory** set to `/frontend` and
+  start command `npm start`. Set `API_BASE_URL` to the backend public URL
+  followed by `/api`, for example `https://your-api.up.railway.app/api`.
+  The frontend server publishes this value through `/config.json`; the
+  browser never reads a `.env` file directly.
+5. Add a Railway Volume to the backend and mount it at the backend's
+  `uploads` directory (commonly `/app/uploads`) if uploaded resumes must
+  survive redeployments. Without persistent storage, Railway's container
+  filesystem is temporary.
+
+Railway supplies `PORT` for both services. The frontend configuration is
+public by design and must contain only the backend URL, never credentials or
+secrets. The frontend server also defaults to `http://localhost:5000/api` for
+local development; configure `API_BASE_URL` on Railway before deploying.
 
 ## API conventions
 

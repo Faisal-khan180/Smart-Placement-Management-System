@@ -1,7 +1,21 @@
 /**
  * Central API client & UI Helper for Smart Placement Management System (SPMS)
  */
-const API_BASE_URL = "http://localhost:5000/api";
+let API_BASE_URL = "/api";
+const apiConfigReady = fetch('/config.json', { cache: 'no-store' })
+  .then((response) => response.ok ? response.json() : null)
+  .then((config) => {
+    if (typeof config?.apiBaseUrl === 'string' && config.apiBaseUrl.trim()) {
+      API_BASE_URL = config.apiBaseUrl.replace(/\/+$/, '');
+    }
+  })
+  .catch(() => {});
+
+function apiAssetUrl(url) {
+  if (/^https?:\/\//i.test(url)) return url;
+  const serverBase = API_BASE_URL.replace(/\/api\/?$/, '');
+  return `${serverBase}${url.startsWith('/') ? '' : '/'}${url}`;
+}
 
 function getToken() {
   return localStorage.getItem("token");
@@ -67,6 +81,7 @@ function requireAuth(allowedRoles = []) {
  * Universal API fetch helper
  */
 async function apiRequest(path, { method = "GET", body, auth = true, isFormData = false } = {}) {
+  await apiConfigReady;
   const headers = {};
   if (!isFormData) {
     headers["Content-Type"] = "application/json";

@@ -379,7 +379,7 @@
     // Resume Box
     const resBox = document.getElementById('resumeStatusBox');
     if (s.resume_url) {
-      const downloadUrl = `http://localhost:5000${s.resume_url.startsWith('/') ? '' : '/'}${s.resume_url}`;
+      const downloadUrl = apiAssetUrl(s.resume_url);
       resBox.innerHTML = `
         <div class="d-flex align-items-center justify-content-between p-2 bg-light border rounded">
           <div class="d-flex align-items-center gap-2">

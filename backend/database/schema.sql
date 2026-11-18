@@ -1,15 +1,10 @@
 -- =====================================================================
 -- Smart Placement Management System — Database Schema (Full)
 -- =====================================================================
--- Run via: npm run db:migrate  (see database/migrate.js)
+-- Run via: npm run db:migrate  (see database/migrate.js, selects DB_NAME)
 -- Engine: InnoDB everywhere (foreign keys + transactions).
 -- Charset: utf8mb4 everywhere (emoji-safe, standard for new MySQL apps).
 -- =====================================================================
-
-CREATE DATABASE IF NOT EXISTS `placement_management`
-  CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
-USE `placement_management`;
 
 SET FOREIGN_KEY_CHECKS = 0;
 

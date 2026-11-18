@@ -34,22 +34,35 @@ async function addColumnIfMissing(connection, table, column, definition) {
 async function migrate() {
   const schemaPath = path.join(__dirname, 'schema.sql');
   const schemaSql = fs.readFileSync(schemaPath, 'utf8');
+  const databaseName = process.env.DB_NAME || 'placement_management';
+  if (!/^[A-Za-z0-9_$]+$/.test(databaseName)) {
+    throw new Error('DB_NAME must contain only letters, numbers, underscores, or dollar signs.');
+  }
 
-  const connection = await mysql.createConnection({
+  const connectionOptions = {
     host: process.env.DB_HOST || 'localhost',
     port: process.env.DB_PORT || 3306,
     user: process.env.DB_USER || 'root',
     password: process.env.DB_PASSWORD || '',
     multipleStatements: true
-  });
+  };
+  let connection;
+
+  try {
+    connection = await mysql.createConnection({ ...connectionOptions, database: databaseName });
+  } catch (err) {
+    if (err.code !== 'ER_BAD_DB_ERROR') throw err;
+    connection = await mysql.createConnection(connectionOptions);
+    await connection.query(
+      `CREATE DATABASE IF NOT EXISTS \`${databaseName}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`
+    );
+    await connection.changeUser({ database: databaseName });
+  }
 
   try {
     console.log('Applying database/schema.sql ...');
     await connection.query(schemaSql);
     console.log('Base schema verified (13 tables).');
-
-    // Ensure placement_management is the selected database for column checks
-    await connection.changeUser({ database: process.env.DB_NAME || 'placement_management' });
 
     // Ensure all phase columns exist on existing databases
     await addColumnIfMissing(connection, 'students', 'course', 'VARCHAR(100) DEFAULT NULL');

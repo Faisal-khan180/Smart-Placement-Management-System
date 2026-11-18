@@ -200,9 +200,7 @@
     tbody.innerHTML = students.map(s => {
       let resumeHtml = '<span class="text-muted small">No Resume</span>';
       if (s.resume_url) {
-        const fullUrl = s.resume_url.startsWith('http')
-          ? s.resume_url
-          : `http://localhost:5000${s.resume_url.startsWith('/') ? '' : '/'}${s.resume_url}`;
+        const fullUrl = apiAssetUrl(s.resume_url);
         resumeHtml = `<a href="${fullUrl}" target="_blank" class="btn btn-sm btn-outline-primary py-0 px-2">📄 CV</a>`;
       }
 
@@ -326,9 +324,7 @@
 
       let resumeBtn = '<span class="text-muted small">No resume uploaded yet</span>';
       if (s.resume_url) {
-        const fullUrl = s.resume_url.startsWith('http')
-          ? s.resume_url
-          : `http://localhost:5000${s.resume_url.startsWith('/') ? '' : '/'}${s.resume_url}`;
+        const fullUrl = apiAssetUrl(s.resume_url);
         resumeBtn = `<a href="${fullUrl}" target="_blank" class="btn btn-sm btn-primary">📄 View / Download Resume</a>`;
       }
 

@@ -151,9 +151,7 @@
       // Fix resume URL resolution to prevent double prefix
       let resumeLinkHtml = '<span class="text-muted small">No Resume</span>';
       if (app.resume_url) {
-        const fullUrl = app.resume_url.startsWith('http')
-          ? app.resume_url
-          : `http://localhost:5000${app.resume_url.startsWith('/') ? '' : '/'}${app.resume_url}`;
+        const fullUrl = apiAssetUrl(app.resume_url);
         resumeLinkHtml = `<a href="${fullUrl}" target="_blank" class="btn btn-sm btn-outline-primary">📄 View CV</a>`;
       }
 

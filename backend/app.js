@@ -9,7 +9,11 @@ const { successResponse } = require('./utils/response');
 const app = express();
 
 // ---- Core middleware ----
-app.use(cors());
+const allowedOrigins = (process.env.FRONTEND_ORIGIN || '')
+  .split(',')
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+app.use(cors({ origin: allowedOrigins.length ? allowedOrigins : true }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -19,6 +23,11 @@ if (process.env.NODE_ENV !== 'test') {
 
 // Ignore favicon 404
 app.get('/favicon.ico', (req, res) => res.status(204).end());
+
+app.get('/config.json', (req, res) => {
+  res.set('Cache-Control', 'no-store');
+  res.json({ apiBaseUrl: process.env.API_BASE_URL || '/api' });
+});
 
 // ---- Static file serving ----
 // 1. Uploaded student resumes
