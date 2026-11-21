@@ -160,8 +160,9 @@ have independent environment variables:
 
 Railway supplies `PORT` for both services. The frontend configuration is
 public by design and must contain only the backend URL, never credentials or
-secrets. The frontend server also defaults to `http://localhost:5000/api` for
-local development; configure `API_BASE_URL` on Railway before deploying.
+secrets. The frontend server defaults to `http://localhost:5000/api` on local hosts
+and to this project's Railway API on public hosts. Set `API_BASE_URL` to your
+backend URL (ending in `/api`) when deploying a different backend.
 
 ## API conventions
 
